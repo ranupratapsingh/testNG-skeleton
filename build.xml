@@ -1,0 +1,55 @@
+<project name="testng" default="runTests" basedir=".">
+	<property file="build.properties"/>
+
+	<path id="build-classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="test-classpath">
+		<path refid="build-classpath"/>
+		<pathelement location="${build.dir}"/>
+	</path>
+
+	<target name="clean">
+		<echo message="cleaning"/>
+		<delete dir="${build.dir}"/>
+		<delete dir="${testResults.dir}"/>
+	</target>
+
+	<!--compiling main source files-->
+	<target name="compile-sources" depends="clean">
+		<echo message="compiling main sources"/>
+		<mkdir dir="${build.dir}"/>
+		<javac source="1.5"
+			   classpathref="build-classpath"
+			   srcdir="${source.dir}"
+			   destdir="${build.dir}"/>
+	</target>
+
+	<!--compiling test source files-->
+	<target name="compile-tests" depends="compile-sources">
+		<echo message="compiling test sources"/>
+		<mkdir dir="${build.dir}"/>
+		<javac source="1.5"
+			   classpathref="build-classpath"
+			   srcdir="${testSource.dir}"
+			   destdir="${build.dir}"/>
+	</target>
+
+	<!--defining testng task-->
+	<taskdef name="testng"
+			 classname="org.testng.TestNGAntTask"
+			 classpathref="build-classpath"/>
+
+	<!--running the tests-->
+	<target name="runTests" depends="compile-tests">
+		<echo message="running tests"/>
+		<testng classpathref="test-classpath" outputDir="${testResults.dir}">
+			<xmlfileset dir="${testSource.dir}" includes="testng.xml"/>
+			<jvmarg value="-ea"/>
+		</testng>
+	</target>
+
+</project>
